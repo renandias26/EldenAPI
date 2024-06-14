@@ -11,6 +11,9 @@ export class Log {
     @Prop({ type: mongoose.Schema.Types.Mixed })
     response: any;
 
+    @Prop({ type: mongoose.Schema.Types.Mixed })
+    error: any;
+
     @Prop()
     responseTime: number;
 }

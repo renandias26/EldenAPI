@@ -9,6 +9,7 @@ import { LoggingInterceptor } from './common/interceptor/logging.interceptor';
 import { AmmosModule } from './ammos/ammos.module';
 import { Log, LogSchema } from './common/interceptor/log.schema';
 import { LogModel } from './common/interceptor/log.model';
+import { ExceptionLoggingInterceptor } from './common/interceptor/exception.interceptor';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { LogModel } from './common/interceptor/log.model';
   ],
   controllers: [AppController],
   providers: [
-    AppService, LoggingInterceptor, LogModel
+    AppService, LoggingInterceptor, LogModel, ExceptionLoggingInterceptor
   ],
 })
 export class AppModule { }

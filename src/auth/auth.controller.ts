@@ -1,18 +1,26 @@
-import { Controller, Param, Post } from '@nestjs/common';
+import { Controller, Body, Post, ValidationPipe, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBadRequestResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
-import { IsObjectIdPipe } from 'nestjs-object-id';
+import { loginUserDto } from '../users/dto/loginUser.dto';
+import { UsersService } from 'src/users/users.service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(
+    private readonly authService: AuthService,
+    private usersService: UsersService,
+  ) { }
 
-  @Post(":id")
+  @Post("")
   @ApiOkResponse()
   @ApiBadRequestResponse()
-  @ApiParam({ name: 'id', description: 'The ID of the user', format: 'uuid' })
-  createToken(@Param('id', IsObjectIdPipe) userID: string) {
-    return this.authService.create(userID);
+  async createToken(@Body(new ValidationPipe()) loginUserDto: loginUserDto) {
+    try {
+      const userID = await this.usersService.login(loginUserDto)
+      return this.authService.create(userID, loginUserDto.email);
+    } catch (error) {
+      throw new BadRequestException(error)
+    }
   }
 }

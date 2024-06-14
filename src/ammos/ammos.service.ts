@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CreateAmmoDto } from './dto/create-ammo.dto';
 import { UpdateAmmoDto } from './dto/update-ammo.dto';
 import { EldenAPIService } from 'src/EldenAPI/EldenApi.service';
-import { Ammo } from './entities/ammo.entity';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose/dist/common/mongoose.decorators';
 import { AmmoData } from './interfaces/ammo.interface';
+import { Ammo, AmmoSchema } from './schema/ammo.schema';
+import { EldenRequest } from 'src/EldenAPI/interfaces/EldenRequest.interface';
 
 @Injectable()
 export class AmmosService {
@@ -15,22 +16,28 @@ export class AmmosService {
   ) { }
 
   create(createAmmoDto: CreateAmmoDto) {
-    return 'This action adds a new ammo';
+    return new this.AmmoModel(createAmmoDto).save()
   }
 
-  findAll() {
-    return this.EldenAPI.get<AmmoData>("ammos");
+  async findAll() {
+    const data = await this.AmmoModel.find()
+    if (data.length > 0) {
+      return data
+    }
+
+    const obj = await this.EldenAPI.get<EldenRequest<AmmoData[]>>("ammos");
+    return await this.AmmoModel.insertMany(obj.data)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} ammo`;
+  findOne(id: string) {
+    return this.AmmoModel.findById(id)
   }
 
-  update(id: number, updateAmmoDto: UpdateAmmoDto) {
-    return `This action updates a #${id} ammo`;
+  update(id: string, updateAmmoDto: UpdateAmmoDto) {
+    return this.AmmoModel.findByIdAndUpdate(id, updateAmmoDto)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} ammo`;
+  remove(id: string) {
+    return this.AmmoModel.findByIdAndDelete(id)
   }
 }
