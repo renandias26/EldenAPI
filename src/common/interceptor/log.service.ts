@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Log, LogSchema } from './log.schema';
 
 @Injectable()
-export class LogModel {
+export class LogsService {
     constructor(@InjectModel(Log.name) private readonly logModel: Model<Log>) { }
 
     async createLog(logData: Partial<Log>): Promise<Log> {

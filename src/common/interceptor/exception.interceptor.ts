@@ -1,12 +1,12 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor, Logger } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { LogModel } from './log.model';
+import { LogsService } from './log.service';
 
 @Injectable()
 export class ExceptionLoggingInterceptor implements NestInterceptor {
     private readonly logger = new Logger(ExceptionLoggingInterceptor.name);
-    constructor(private readonly logModel: LogModel) { }
+    constructor(private readonly logModel: LogsService) { }
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
         const requestTime = Date.now();
@@ -17,7 +17,11 @@ export class ExceptionLoggingInterceptor implements NestInterceptor {
                 const ctx = context.switchToHttp();
                 const request = ctx.getRequest<Request>();
                 this.logModel.createLog({
-                    request: request,
+                    request: {
+                        body: request.body,
+                        headers: request.headers,
+                        method: request.method
+                    },
                     error: err,
                     responseTime: diffTime
                 })

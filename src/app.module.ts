@@ -1,15 +1,15 @@
-import { Module } from '@nestjs/common/decorators/modules/module.decorator';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { MongooseModule } from '@nestjs/mongoose/dist/mongoose.module';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { LoggingInterceptor } from './common/interceptor/logging.interceptor';
-import { AmmosModule } from './ammos/ammos.module';
-import { Log, LogSchema } from './common/interceptor/log.schema';
-import { LogModel } from './common/interceptor/log.model';
-import { ExceptionLoggingInterceptor } from './common/interceptor/exception.interceptor';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { APP_INTERCEPTOR } from "@nestjs/core";
+import { MongooseModule } from "@nestjs/mongoose";
+import { AmmosModule } from "./ammos/ammos.module";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
+import { ExceptionLoggingInterceptor } from "./common/interceptor/exception.interceptor";
+import { LogsModule } from "./common/interceptor/log.module";
+import { LoggingInterceptor } from "./common/interceptor/logging.interceptor";
+import { UsersModule } from "./users/users.module";
 
 @Module({
   imports: [
@@ -20,14 +20,22 @@ import { ExceptionLoggingInterceptor } from './common/interceptor/exception.inte
       }),
       inject: [ConfigService],
     }),
-    MongooseModule.forFeature([{ name: Log.name, schema: LogSchema }]),
     UsersModule,
     AuthModule,
-    AmmosModule
+    AmmosModule,
+    LogsModule
   ],
   controllers: [AppController],
   providers: [
-    AppService, LoggingInterceptor, LogModel, ExceptionLoggingInterceptor
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ExceptionLoggingInterceptor,
+    },
   ],
 })
 export class AppModule { }
