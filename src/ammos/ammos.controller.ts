@@ -4,10 +4,14 @@ import { CreateAmmoDto } from './dto/create-ammo.dto';
 import { UpdateAmmoDto } from './dto/update-ammo.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { IsObjectIdPipe } from 'nestjs-object-id/dist/pipes/is-object-id.pipe';
+import { SocketGateway } from 'src/socket/socket.gateway';
 
 @Controller('ammos')
 export class AmmosController {
-  constructor(private readonly ammosService: AmmosService) { }
+  constructor(
+    private readonly ammosService: AmmosService,
+    private readonly socketGateway: SocketGateway
+  ) { }
 
   @UseGuards(AuthGuard)
   @Post()
@@ -23,6 +27,7 @@ export class AmmosController {
   @Get()
   findAll() {
     try {
+      this.socketGateway.server.emit('findAll')
       return this.ammosService.findAll();
     } catch (error) {
       throw new BadRequestException(error)

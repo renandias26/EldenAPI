@@ -10,6 +10,7 @@ import { ExceptionLoggingInterceptor } from "./common/interceptor/exception.inte
 import { LogsModule } from "./common/interceptor/log.module";
 import { LoggingInterceptor } from "./common/interceptor/logging.interceptor";
 import { UsersModule } from "./users/users.module";
+import { SocketModule } from "./socket/socket.module";
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { UsersModule } from "./users/users.module";
     UsersModule,
     AuthModule,
     AmmosModule,
-    LogsModule
+    LogsModule,
+    SocketModule
   ],
   controllers: [AppController],
   providers: [
